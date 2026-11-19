@@ -1,0 +1,138 @@
+// ~->[DNET-1]->~
+
+// File created by an unlicensed user using Netica 7.01 on Oct 15, 2025 at 15:36:56 UTC.
+
+bnet PneumoniaDiagnosis {
+autoupdate = TRUE;
+whenchanged = 1760344930;
+
+visual V4 {
+	defdispform = BELIEFBARS;
+	nodelabeling = TITLE;
+	NodeMaxNumEntries = 50;
+	nodefont = font {shape= "Arial"; size= 9;};
+	linkfont = font {shape= "Arial"; size= 9;};
+	ShowLinkStrengths = 1;
+	windowposn = (78, 78, 1334, 614);
+	scrollposn = (197, 35);
+	resolution = 72;
+	magnification = 1.41421;
+	drawingbounds = (1515, 774);
+	showpagebreaks = FALSE;
+	usegrid = TRUE;
+	gridspace = (6, 6);
+	NodeSet Node {BuiltIn = 1; Color = 0x00e1e1e1;};
+	NodeSet Nature {BuiltIn = 1; Color = 0x00f8eed2;};
+	NodeSet Deterministic {BuiltIn = 1; Color = 0x00d3caa6;};
+	NodeSet Finding {BuiltIn = 1; Color = 0x00c8c8c8;};
+	NodeSet Constant {BuiltIn = 1; Color = 0x00ffffff;};
+	NodeSet ConstantValue {BuiltIn = 1; Color = 0x00ffffb4;};
+	NodeSet Utility {BuiltIn = 1; Color = 0x00ffbdbd;};
+	NodeSet Decision {BuiltIn = 1; Color = 0x00dee8ff;};
+	NodeSet Documentation {BuiltIn = 1; Color = 0x00f0fafa;};
+	NodeSet Title {BuiltIn = 1; Color = 0x00ffffff;};
+	PrinterSetting A {
+		margins = (1270, 1270, 1270, 1270);
+		};
+	};
+
+node Age {
+	discrete = TRUE;
+	states = (under_15, between_15_to_44, between_45_to_64, over_64);
+	kind = NATURE;
+	parents = ();
+	ExperBase = 1;
+	title = "Age";
+	comment = "The patient's age in years";
+	whenchanged = 1760343836;
+	visual V4 {
+		center = (714, 162);
+		height = 5;
+		};
+	};
+
+node VaccinationUpToDate {
+	discrete = TRUE;
+	states = (yes, no);
+	kind = NATURE;
+	parents = (Age);
+	title = "Vaccination up to date";
+	comment = "Whether or not the patient is up to date with their pneumococcal vaccines, which protects \
+		against the main type of bacterial pneumonia";
+	whenchanged = 1760344568;
+	visual V4 {
+		center = (1002, 228);
+		height = 6;
+		};
+	};
+
+node Immunocompromised {
+	discrete = TRUE;
+	states = (yes, no);
+	kind = NATURE;
+	parents = ();
+	title = "Immunocompromised";
+	comment = "Whether the patient has weakened immune system";
+	whenchanged = 1760344718;
+	visual V4 {
+		center = (450, 222);
+		height = 7;
+		};
+	};
+
+node PneumoniaType {
+	discrete = TRUE;
+	states = (bacterial, viral, none);
+	kind = NATURE;
+	parents = (Age, Immunocompromised, VaccinationUpToDate);
+	title = "Pneumonia type";
+	comment = "The patient's type of pneumonia";
+	whenchanged = 1760344739;
+	visual V4 {
+		center = (714, 300);
+		height = 1;
+		};
+	};
+
+node ShortnessOfBreath {
+	discrete = TRUE;
+	states = (yes, no);
+	kind = NATURE;
+	parents = (PneumoniaType);
+	title = "Shortness of breath";
+	comment = "Whether the patient has one of the sign of bacterial pneumonia";
+	whenchanged = 1760344583;
+	visual V4 {
+		center = (456, 450);
+		height = 4;
+		};
+	};
+
+node CRP {
+	discrete = TRUE;
+	states = (normal_0_to_20, moderate_20_to_100, high_100_to_200);
+	kind = NATURE;
+	parents = (PneumoniaType);
+	title = "CRP";
+	comment = "Clinical blood marker C-reactive protein which represents a sign of bacterial pneumonia";
+	whenchanged = 1760344930;
+	visual V4 {
+		center = (714, 450);
+		height = 2;
+		};
+	};
+
+node XrayResult {
+	discrete = TRUE;
+	states = (normal, consolidation, consolidation_with_PE);
+	kind = NATURE;
+	parents = (PneumoniaType);
+	title = "X-ray result";
+	comment = "The result of the patient's X-ray test";
+	whenchanged = 1760344607;
+	visual V4 {
+		center = (984, 450);
+		height = 3;
+		};
+	};
+};

@@ -1,0 +1,254 @@
+// ~->[DNET-1]->~
+
+// File created by an unlicensed user using Netica 7.01 on Oct 15, 2025 at 15:36:27 UTC.
+
+bnet PneumoniaDiagnosis {
+AutoCompile = TRUE;
+autoupdate = TRUE;
+whenchanged = 1760448788;
+
+visual V1 {
+	defdispform = BELIEFBARS;
+	nodelabeling = TITLE;
+	NodeMaxNumEntries = 50;
+	nodefont = font {shape= "Arial"; size= 9;};
+	linkfont = font {shape= "Arial"; size= 9;};
+	ShowLinkStrengths = 1;
+	windowposn = (52, 52, 1356, 711);
+	scrollposn = (189, 121);
+	resolution = 72;
+	magnification = 1.41421;
+	drawingbounds = (1515, 774);
+	showpagebreaks = FALSE;
+	usegrid = TRUE;
+	gridspace = (6, 6);
+	NodeSet Node {BuiltIn = 1; Color = 0x00e1e1e1;};
+	NodeSet Nature {BuiltIn = 1; Color = 0x00f8eed2;};
+	NodeSet Deterministic {BuiltIn = 1; Color = 0x00d3caa6;};
+	NodeSet Finding {BuiltIn = 1; Color = 0x00c8c8c8;};
+	NodeSet Constant {BuiltIn = 1; Color = 0x00ffffff;};
+	NodeSet ConstantValue {BuiltIn = 1; Color = 0x00ffffb4;};
+	NodeSet Utility {BuiltIn = 1; Color = 0x00ffbdbd;};
+	NodeSet Decision {BuiltIn = 1; Color = 0x00dee8ff;};
+	NodeSet Documentation {BuiltIn = 1; Color = 0x00f0fafa;};
+	NodeSet Title {BuiltIn = 1; Color = 0x00ffffff;};
+	PrinterSetting A {
+		margins = (1270, 1270, 1270, 1270);
+		};
+	};
+
+node Age {
+	discrete = TRUE;
+	states = (under_15, between_15_to_44, between_45_to_64, over_64);
+	kind = NATURE;
+	parents = ();
+	ExperBase = 1;
+	title = "Age";
+	comment = "The patient's age in years";
+	whenchanged = 1760444172;
+	belief = (0.25, 0.25, 0.25, 0.25);
+	visual V1 {
+		center = (738, 210);
+		height = 6;
+		};
+	};
+
+node Immunocompromised {
+	discrete = TRUE;
+	states = (yes, no);
+	kind = NATURE;
+	chance = CHANCE;
+	parents = (Age);
+	probs = 
+		// yes          no            // Age              
+		  (0.01,        0.99,         // under 15         
+		   0.01,        0.99,         // between 15 to 44 
+		   0.01,        0.99,         // between 45 to 64 
+		   0.07,        0.93);        // over 64          ;
+	title = "Immunocompromised";
+	comment = "Whether the patient has weakened immune system";
+	whenchanged = 1760443862;
+	belief = (0.025, 0.975);
+	visual V1 {
+		center = (432, 318);
+		height = 5;
+		};
+	};
+
+node VaccinationUpToDate {
+	discrete = TRUE;
+	states = (yes, no);
+	kind = NATURE;
+	chance = CHANCE;
+	parents = (Age, Immunocompromised);
+	probs = 
+		// yes          no            // Age              Immunocompromised 
+		  (0.9,         0.1,          // under 15         yes               
+		   0.9,         0.1,          // under 15         no                
+		   0.12,        0.88,         // between 15 to 44 yes               
+		   0.06,        0.94,         // between 15 to 44 no                
+		   0.16,        0.84,         // between 45 to 64 yes               
+		   0.08,        0.92,         // between 45 to 64 no                
+		   0.75,        0.25,         // over 64          yes               
+		   0.5,         0.5);         // over 64          no                ;
+	title = "Vaccination up to date";
+	comment = "Whether or not the patient is up to date with their pneumococcal vaccines, which protects \
+		against the main type of bacterial pneumonia";
+	whenchanged = 1760446380;
+	belief = (0.389725, 0.610275);
+	visual V1 {
+		center = (648, 342);
+		height = 7;
+		};
+	};
+
+node PneumoniaType {
+	discrete = TRUE;
+	states = (bacterial, viral, none);
+	kind = NATURE;
+	chance = CHANCE;
+	parents = (Age, Immunocompromised, VaccinationUpToDate);
+	probs = 
+		// bacterial    viral        none          // Age              Immunocompromised VaccinationUpToDate 
+		  (0.044,       0.44,        0.516,        // under 15         yes               yes                 
+		   0.24,        0.25,        0.51,         // under 15         yes               no                  
+		   0.04,        0.4,         0.56,         // under 15         no                yes                 
+		   0.16,        0.32,        0.52,         // under 15         no                no                  
+		   0.011,       0.11,        0.879,        // between 15 to 44 yes               yes                 
+		   0.075,       0.15,        0.775,        // between 15 to 44 yes               no                  
+		   0.01,        0.1,         0.89,         // between 15 to 44 no                yes                 
+		   0.05,        0.1,         0.85,         // between 15 to 44 no                no                  
+		   0.011,       0.11,        0.879,        // between 45 to 64 yes               yes                 
+		   0.075,       0.15,        0.775,        // between 45 to 64 yes               no                  
+		   0.01,        0.1,         0.89,         // between 45 to 64 no                yes                 
+		   0.05,        0.1,         0.85,         // between 45 to 64 no                no                  
+		   0.066,       0.66,        0.274,        // over 64          yes               yes                 
+		   0.45,        0.5,         0.05,         // over 64          yes               no                  
+		   0.06,        0.6,         0.34,         // over 64          no                yes                 
+		   0.3,         0.6,         0.1);         // over 64          no                no                  ;
+	numcases = 
+		                 // Age              Immunocompromised VaccinationUpToDate 
+		  (0,            // under 15         yes               yes                 
+		   0,            // under 15         yes               no                  
+		   0,            // under 15         no                yes                 
+		   0.68,         // under 15         no                no                  
+		   0,            // between 15 to 44 yes               yes                 
+		   0,            // between 15 to 44 yes               no                  
+		   0,            // between 15 to 44 no                yes                 
+		   0.2,          // between 15 to 44 no                no                  
+		   0,            // between 45 to 64 yes               yes                 
+		   0,            // between 45 to 64 yes               no                  
+		   0,            // between 45 to 64 no                yes                 
+		   0.2,          // between 45 to 64 no                no                  
+		   0,            // over 64          yes               yes                 
+		   0,            // over 64          yes               no                  
+		   0,            // over 64          no                yes                 
+		   0.9);         // over 64          no                no                  ;
+	title = "Pneumonia type";
+	comment = "The patient's type of pneumonia";
+	whenchanged = 1760448788;
+	belief = (0.0814082, 0.2986445, 0.6199473);
+	visual V1 {
+		center = (738, 462);
+		height = 1;
+		};
+	};
+
+node ShortnessOfBreath {
+	discrete = TRUE;
+	states = (yes, no);
+	kind = NATURE;
+	chance = CHANCE;
+	parents = (PneumoniaType, Age);
+	probs = 
+		// yes          no            // PneumoniaType Age              
+		  (0.7,         0.3,          // bacterial     under 15         
+		   0.3,         0.7,          // bacterial     between 15 to 44 
+		   0.5,         0.5,          // bacterial     between 45 to 64 
+		   0.7,         0.3,          // bacterial     over 64          
+		   0.35,        0.65,         // viral         under 15         
+		   0.15,        0.85,         // viral         between 15 to 44 
+		   0.25,        0.75,         // viral         between 45 to 64 
+		   0.35,        0.65,         // viral         over 64          
+		   0.05,        0.95,         // none          under 15         
+		   0.05,        0.95,         // none          between 15 to 44 
+		   0.05,        0.95,         // none          between 45 to 64 
+		   0.05,        0.95);        // none          over 64          ;
+	numcases = 
+		                 // PneumoniaType Age              
+		  (0.7,          // bacterial     under 15         
+		   0.3,          // bacterial     between 15 to 44 
+		   0.5,          // bacterial     between 45 to 64 
+		   0.7,          // bacterial     over 64          
+		   0.35,         // viral         under 15         
+		   0.15,         // viral         between 15 to 44 
+		   0.25,         // viral         between 45 to 64 
+		   0.35,         // viral         over 64          
+		   0,            // none          under 15         
+		   0,            // none          between 15 to 44 
+		   0,            // none          between 45 to 64 
+		   0);           // none          over 64          ;
+	title = "Shortness of breath";
+	comment = "Whether the patient has one of the sign of bacterial pneumonia";
+	whenchanged = 1760444101;
+	belief = (0.1778465, 0.8221535);
+	visual V1 {
+		center = (948, 576);
+		height = 4;
+		};
+	};
+
+node CRP {
+	discrete = TRUE;
+	states = (normal, moderate, high);
+	kind = NATURE;
+	chance = CHANCE;
+	parents = (PneumoniaType, Immunocompromised);
+	probs = 
+		// normal       moderate     high          // PneumoniaType Immunocompromised 
+		  (0.225,       0.425,       0.35,         // bacterial     yes               
+		   0.05,        0.25,        0.7,          // bacterial     no                
+		   0.2875,      0.6375,      0.075,        // viral         yes               
+		   0.25,        0.6,         0.15,         // viral         no                
+		   0.485,       0.505,       0.01,         // none          yes               
+		   0.48,        0.5,         0.02);        // none          no                ;
+	numcases = 
+		                 // PneumoniaType Immunocompromised 
+		  (0.7,          // bacterial     yes               
+		   0.7,          // bacterial     no                
+		   0,            // viral         yes               
+		   0,            // viral         no                
+		   0,            // none          yes               
+		   0);           // none          no                ;
+	title = "CRP";
+	comment = "Clinical blood marker C-reactive protein which represents a sign of bacterial pneumonia";
+	whenchanged = 1760444098;
+	belief = (0.3774067, 0.5106128, 0.1119805);
+	visual V1 {
+		center = (522, 576);
+		height = 2;
+		};
+	};
+
+node XrayResult {
+	discrete = TRUE;
+	states = (normal, consolidation, consolidation_with_PE);
+	kind = NATURE;
+	chance = CHANCE;
+	parents = (PneumoniaType);
+	probs = 
+		// normal       consolidation consolidation wi  // PneumoniaType 
+		  (0.05,        0.8,         0.15,         // bacterial     
+		   0.68,        0.3,         0.02,         // viral         
+		   0.97,        0.02,        0.01);        // none          ;
+	title = "X-ray result";
+	comment = "The result of the patient's X-ray test";
+	whenchanged = 1760448784;
+	belief = (0.8084975, 0.1671189, 0.02438359);
+	visual V1 {
+		center = (738, 576);
+		height = 3;
+		};
+	};
+ElimOrder = (XrayResult, CRP, ShortnessOfBreath, Age, Immunocompromised, VaccinationUpToDate, PneumoniaType);
+};
